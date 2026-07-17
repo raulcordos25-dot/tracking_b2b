@@ -1,0 +1,88 @@
+/* public/style.css */
+
+/* 1. Stilizarea generală a paginii (Fundal și Font) */
+body {
+    background-color: #f4f7f6; /* Un gri-albăstrui foarte deschis, relaxant */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333333;
+}
+
+/* 2. Titlul Principal */
+h2.text-primary {
+    color: #2c3e50 !important; /* Un bleumarin elegant, înlocuiește albastrul standard */
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-top: 20px;
+}
+
+/* 3. Containerul pentru formular (Efect de Card) */
+.card {
+    border: none;
+    border-radius: 12px; /* Colțuri rotunjite */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05); /* Umbră fină pentru profunzime */
+    background-color: #e3ded7;
+    padding: 10px;
+}
+
+.card-title {
+    color: #4a90e2;
+    font-weight: 600;
+    border-bottom: 2px solid #f4f7f6;
+    padding-bottom: 10px;
+}
+
+/* 4. Stilizarea Butonului de Salvare */
+.btn-primary {
+    background-color: #285570;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease; /* Face ca schimbarea de culoare să fie fluidă */
+}
+
+/* Efectul când treci cu mouse-ul peste buton */
+.btn-primary:hover {
+    background-color: #357abd;
+    transform: translateY(-2px); /* Butonul se ridică foarte puțin */
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+
+/* 5. Stilizarea Tabelului cu date */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden; /* Ne asigurăm că tabelul nu iese din marginile rotunjite */
+}
+
+.table {
+    margin-bottom: 0;
+    background-color: #1E5631;
+}
+
+/* Capul de tabel (unde scrie Enabler, Proiect, etc.) */
+.table-dark {
+    background-color: #2c3e50 !important;
+    color: red;
+}
+
+.table thead th {
+    border: none;
+    padding: 16px;
+    font-weight: 600;
+    text-transform: uppercase; /* Litere mari pentru claritate */
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+/* Celulele tabelului */
+.table tbody td {
+    vertical-align: middle;
+    padding: 16px;
+    border-bottom: 1px solid #333333;
+}
+
+/* Efect când treci cu mouse-ul peste un rând din tabel */
+.table tbody tr:hover {
+    background-color: #f8fafc;
+    cursor: default;
+}

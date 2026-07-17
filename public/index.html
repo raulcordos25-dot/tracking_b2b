@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker Proiecte Enablers</title>
+    <!-- Includem Bootstrap pentru un design modern fără a scrie mult CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4 text-primary">Management Proiecte Enablers</h2>
+    
+    <!-- Secțiunea pentru formularul de adăugare date -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Adaugă un proiect nou</h5>
+            <!-- public/index.html (Doar secțiunea formularului) -->
+<form id="formularProiect">
+
+    <input type="hidden" id="proiectId" value="">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">Nume Enabler</label>
+            <input type="text" class="form-control" id="enabler" required>
+        </div>
+        
+        <!-- MODIFICAREA 1: Lista Drop-down pentru Proiect -->
+        <div class="col-md-4">
+            <label class="form-label">Proiect Dorit</label>
+            <!-- Folosim <select> în loc de <input> pentru a crea lista -->
+            <select class="form-select" id="proiect" required>
+                <option value="heartbeat">heartbeat</option>
+<option value="fingerprint">fingerprint</option>
+<option value="global classroom">global classroom</option>
+<option value="discover">discover</option>
+<option value="happy bus">happy bus</option>
+<option value="youth 4 impact">youth 4 impact</option>
+<option value="raise your voice">raise your voice</option>
+<option value="skill up!">skill up!</option>
+<option value="on the map">on the map</option>
+<option value="equify">equify</option>
+<option value="eco city">eco city</option>
+<option value="eat 4 change">eat 4 change</option>
+<option value="green leaders">green leaders</option>
+<option value="aquatica">aquatica</option>
+<option value="explorer">explorer</option>
+<option value="rooted">rooted</option>
+<option value="myself, my world">myself, my world</option>
+<option value="scale up!">scale up!</option>
+            </select>
+        </div>
+
+        <!-- MODIFICAREA 2: Selectarea a 2 date (Calendar) -->
+        <div class="col-md-4">
+            <label class="form-label">Perioada (Start - Sfârșit)</label>
+            <!-- Folosim un 'input-group' din Bootstrap pentru a le lipi vizual -->
+            <div class="input-group">
+                <!-- type="date" deschide automat un calendar când dai click -->
+                <input type="date" class="form-control" id="dataStart" required>
+                <span class="input-group-text">până la</span>
+                <input type="date" class="form-control" id="dataEnd" required>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Poziții Deschise</label>
+            <input type="number" class="form-control" id="pozitii" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Buget / Bani</label>
+            <input type="text" class="form-control" id="bani">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Locație</label>
+            <input type="text" class="form-control" id="locatie">
+        </div>
+        <div class="col-12">
+            <label class="form-label">Output / Notițe Meeting</label>
+            <textarea class="form-control" id="output" rows="2"></textarea>
+        </div>
+        <div class="col-12 text-end mt-3">
+            <button type="submit" class="btn btn-primary">Salvează în Baza de Date</button>
+        </div>
+    </div>
+</form>
+        </div>
+    </div>
+
+    <!-- Secțiunea unde se afișează datele din MySQL -->
+    <h4 class="mb-3">Lista Proiectelor Salvate</h4>
+    <div class="table-responsive bg-white shadow-sm rounded">
+        <table class="table table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Enabler</th>
+                    <th>Proiect</th>
+                    <th>Perioada</th>
+                    <th>Poziții</th>
+                    <th>Buget</th>
+                    <th>Locație</th>
+                    <th>Output Meeting</th>
+                    <th>Actiuni</th>
+                </tr>
+            </thead>
+            <!-- Aici Javascript va introduce rândurile cu date -->
+            <tbody id="tabelDate">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Conectăm logica noastră JavaScript la acest HTML -->
+<script src="app.js"></script>
+</body>
+</html>
