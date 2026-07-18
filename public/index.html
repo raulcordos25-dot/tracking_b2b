@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="b2b_sales.png">
     <title>Tracker Proiecte Enablers</title>
     <script>
     // Verificăm ce găsește în seif
@@ -26,7 +27,6 @@
     Logat ca: <strong id="emailUtilizator">Se încarcă...</strong>
 </div>
 </head>
-<script src="app.js"></script>
 <body class="bg-light">
 <div class="container mt-5">
     <h2 class="text-center mb-4 text-primary">Management Proiecte Enablers</h2>
@@ -142,6 +142,8 @@
         const dateUtilizator = JSON.parse(window.atob(baza64));
 
         document.getElementById('emailUtilizator').innerText = dateUtilizator.email;
-    }</script>
+    }
+    </script>
+    <script src="app.js"></script>
 </body>
 </html>

@@ -7,6 +7,24 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'un_secret_foarte_complicat_123';// Această linie citește datele din fișierul .env
+// MIDDLEWARE: Verifică dacă cererea are un token valid
+const verificaToken = (req, res, next) => {
+    // 1. Căutăm biletul în "antetul" cererii trimise de browser
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Formatul va fi "Bearer [TOKEN]"
+
+    // Dacă nu există bilet
+    if (!token) return res.status(401).json({ mesaj: 'Acces refuzat. Te rog să te loghezi.' });
+
+    // 2. Verificăm dacă biletul este valid și neschimbat
+    jwt.verify(token, JWT_SECRET, (err, utilizator) => {
+        if (err) return res.status(403).json({ mesaj: 'Sesiune expirată sau invalidă.' });
+        
+        // 3. Salvăm informațiile utilizatorului (ex: ID-ul) în cerere pentru a le folosi la rute
+        req.utilizator = utilizator; 
+        next(); // Permitem trecerea mai departe
+    });
+};
 
 const app = express();
 
@@ -57,6 +75,20 @@ await pool.execute(`
         parola VARCHAR(255) NOT NULL
     )
 `);
+try {
+    // Adăugăm coloana utilizator_id în tabelul proiecte, dacă nu există deja
+    await pool.execute(`
+        ALTER TABLE proiecte 
+        ADD COLUMN utilizator_id INT,
+        ADD FOREIGN KEY (utilizator_id) REFERENCES utilizatori(id)
+    `);
+    console.log("Coloana utilizator_id a fost adăugată în tabelul proiecte.");
+} catch (eroare) {
+    // Ignorăm eroarea dacă coloana există deja (Eroarea 1060 în MySQL)
+    if (eroare.code !== 'ER_DUP_FIELDNAME') {
+        console.error("Eroare la alterarea tabelului:", eroare);
+    }
+}
 
 // 2. Verificăm dacă există deja utilizatori. Dacă nu, creăm unul implicit.
 const [utilizatori] = await pool.execute('SELECT * FROM utilizatori');
@@ -133,75 +165,83 @@ app.post('/api/inregistrare', async (req, res) => {
         res.status(500).json({ mesaj: 'Eroare de server la salvarea utilizatorului.' });
     }
 });
-app.post('/api/proiecte', async (req, res) => {
-    // Extragem fiecare câmp din datele primite
-    const { enabler, proiect, perioada, pozitii, output, bani, locatie } = req.body;
-    
-    // Scriem comanda SQL de inserare
-    const query = `INSERT INTO proiecte (enabler, proiect, perioada, pozitii, output, bani, locatie) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    
+// OBȚINE DOAR PROIECTELE UTILIZATORULUI CURENT
+app.get('/api/proiecte', verificaToken, async (req, res) => {
     try {
-        // Semnele de întrebare (?) sunt înlocuite în siguranță de valorile din array
-        const [rezultat] = await pool.execute(query, [enabler, proiect, perioada, pozitii, output, bani, locatie]);
-        // Răspundem cu succes
-        res.status(201).json({ id: rezultat.insertId, mesaj: 'Proiect salvat cu succes!' });
-    } catch (error) {
-        res.status(500).json({ eroare: error.message });
+        // Selectăm doar proiectele unde utilizator_id este egal cu ID-ul celui care face cererea
+        const [randuri] = await pool.execute('SELECT * FROM proiecte WHERE utilizator_id = ?', [req.utilizator.id]);
+        res.json(randuri);
+    } catch (eroare) {
+        console.error(eroare);
+        res.status(500).json({ mesaj: 'Eroare la preluarea proiectelor' });
     }
 });
 
-// 6. RUTA PENTRU CITIRE (GET): Luăm datele din MySQL și le trimitem la site
-app.get('/api/proiecte', async (req, res) => {
-    // Selectăm totul și ordonăm descrescător după ID (cele mai noi primele)
-    const query = `SELECT * FROM proiecte ORDER BY id DESC`; 
-    
+// ADAUGĂ UN PROIECT NOU ASOCIAT UTILIZATORULUI
+// ADAUGĂ UN PROIECT NOU ASOCIAT UTILIZATORULUI (POST)
+app.post('/api/proiecte', verificaToken, async (req, res) => {
+    // Dacă un câmp nu există, punem '' (text gol) sau 0, ca să nu fie "undefined"
+    const enabler = req.body.enabler || '';
+    const proiect = req.body.proiect || '';
+    const perioada = req.body.perioada || '';
+    const pozitii = req.body.pozitii || 0;
+    const bani = req.body.bani || '';
+    const locatie = req.body.locatie || '';
+    const output = req.body.output || '';
+    const utilizator_id = req.utilizator ? req.utilizator.id : null;
+
     try {
-        const [randuri] = await pool.query(query);
-        res.json(randuri); // Trimitem rândurile către browserul utilizatorului
-    } catch (error) {
-        res.status(500).json({ eroare: error.message });
+        await pool.execute(
+            `INSERT INTO proiecte 
+            (enabler, proiect, perioada, pozitii, bani, locatie, output, utilizator_id) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
+            [enabler, proiect, perioada, pozitii, bani, locatie, output, utilizator_id]
+        );
+        res.status(201).json({ mesaj: 'Proiect adăugat cu succes' });
+    } catch (eroare) {
+        console.error("Eroare SQL la Adăugare:", eroare);
+        res.status(500).json({ mesaj: 'Eroare la adăugarea proiectului' });
     }
 });
 
-// RUTA PENTRU ȘTERGERE (DELETE): Ștergem un proiect pe baza ID-ului
-app.delete('/api/proiecte/:id', async (req, res) => {
-    // Extragem ID-ul din adresa URL (ex: /api/proiecte/5)
+// ACTUALIZEAZĂ UN PROIECT EXISTENT (PUT)
+app.put('/api/proiecte/:id', verificaToken, async (req, res) => {
     const idProiect = req.params.id;
-    
-    // Comanda SQL pentru ștergere
-    const query = `DELETE FROM proiecte WHERE id = ?`;
-    
+    const enabler = req.body.enabler || '';
+    const proiect = req.body.proiect || '';
+    const perioada = req.body.perioada || '';
+    const pozitii = req.body.pozitii || 0;
+    const bani = req.body.bani || '';
+    const locatie = req.body.locatie || '';
+    const output = req.body.output || '';
+    const utilizator_id = req.utilizator ? req.utilizator.id : null;
+
     try {
-        await pool.execute(query, [idProiect]);
-        res.json({ mesaj: 'Proiect șters cu succes!' });
+        // WHERE ne asigură că se actualizează doar dacă proiectul aparține utilizatorului logat
+        await pool.execute(
+            `UPDATE proiecte 
+             SET enabler = ?, proiect = ?, perioada = ?, pozitii = ?, bani = ?, locatie = ?, output = ?
+             WHERE id = ? AND utilizator_id = ?`,
+            [enabler, proiect, perioada, pozitii, bani, locatie, output, idProiect, utilizator_id]
+        );
+        res.json({ mesaj: 'Proiect actualizat cu succes' });
     } catch (eroare) {
-        res.status(500).json({ eroare: eroare.message });
+        console.error("Eroare SQL la Actualizare:", eroare);
+        res.status(500).json({ mesaj: 'Eroare la actualizarea proiectului' });
     }
 });
-// Am adăugat definiția rutei (ex: PUT) și handler-ul asincron
-// Ruta pentru actualizarea unui proiect existent (ex: PUT /api/proiecte/:id)
-app.put('/api/proiecte/:id', async (req, res) => {
-    // 1. Extragem ID-ul din parametrii rutei
-    const idProiect = req.params.id; 
-    
-    // 2. Extragem datele din corpul request-ului
-    const { enabler, proiect, perioada, pozitii, output, bani, locatie } = req.body;
 
-    const query = `UPDATE proiecte SET enabler = ?, proiect = ?, perioada = ?, pozitii = ?, output = ?, bani = ?, locatie = ? WHERE id = ?`;
-    
+// ȘTERGE UN PROIECT (DELETE)
+app.delete('/api/proiecte/:id', verificaToken, async (req, res) => {
+    const idProiect = req.params.id;
+    const utilizator_id = req.utilizator ? req.utilizator.id : null;
+
     try {
-        // 3. Executăm interogarea și captăm rezultatul
-        const [rezultat] = await pool.execute(query, [enabler, proiect, perioada, pozitii, output, bani, locatie, idProiect]);
-        
-        // 4. Verificăm dacă s-a modificat vreun rând în baza de date
-        if (rezultat.affectedRows === 0) {
-            return res.status(404).json({ eroare: 'Proiectul nu a fost găsit!' });
-        }
-
-        res.json({ mesaj: 'Proiect actualizat cu succes!' });
+        await pool.execute('DELETE FROM proiecte WHERE id = ? AND utilizator_id = ?', [idProiect, utilizator_id]);
+        res.json({ mesaj: 'Proiect șters' });
     } catch (eroare) {
-        console.error("Eroare la actualizarea proiectului:", eroare);
-        res.status(500).json({ eroare: 'A apărut o problemă la server.' });
+        console.error("Eroare SQL la Ștergere:", eroare);
+        res.status(500).json({ mesaj: 'Eroare la ștergerea proiectului' });
     }
 });
 
