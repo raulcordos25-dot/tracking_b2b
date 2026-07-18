@@ -6,9 +6,34 @@
     <link rel="icon" type="image/png" href="b2b_sales.png">
     <title>Tracker Proiecte Enablers</title>
     <style>
-    body {
-        background-color: yellow !important;
-    }
+    /* Stilizare tabel modern */
+.table-responsive {
+    border-radius: 12px; /* Colțuri mai rotunjite pentru container */
+    border: 1px solid #eef2f5; /* O margine foarte fină */
+}
+
+.table thead th {
+    background-color: #f8f9fa; /* Fundal gri foarte deschis */
+    color: #6c757d; /* Text gri mediu */
+    font-weight: 600;
+    text-transform: uppercase; /* Litere mari */
+    font-size: 0.80rem; /* Scris puțin mai mic pentru eleganță */
+    letter-spacing: 0.8px; /* Spațiu între litere */
+    border-bottom: 2px solid #e9ecef;
+    padding: 16px; /* Mai mult spațiu de respirat */
+}
+
+.table tbody td {
+    vertical-align: middle; /* Aliniază textul și butoanele perfect pe centru */
+    padding: 16px;
+    color: #495057; /* Un gri închis în loc de negru pur, mai odihnitor */
+    border-bottom: 1px solid #f1f3f5; /* Linie despărțitoare foarte fină */
+}
+
+/* Eliminăm linia de sub ultimul rând pentru un aspect curat */
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
 </style>
     <script>
     // Verificăm ce găsește în seif
