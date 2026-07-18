@@ -78,47 +78,56 @@ async function stergeProiect(id) {
 }
 
 // Interceptarea formularului (aici decidem dacă CREĂM sau ACTUALIZĂM)
-document.getElementById('formularProiect').addEventListener('submit', async (eveniment) => {
-    eveniment.preventDefault(); 
+// Căutăm formularul în pagină
+const formularProiect = document.getElementById('formularProiect');
 
-    const idEditare = document.getElementById('proiectId').value;
-    const perioadaCombinata = `${document.getElementById('dataStart').value} / ${document.getElementById('dataEnd').value}`;
+// Verificăm dacă formularul există înainte de a adăuga evenimentul
+if (formularProiect) {
+    formularProiect.addEventListener('submit', async (eveniment) => {
+        eveniment.preventDefault(); 
 
-    const dateFormular = {
-        enabler: document.getElementById('enabler').value,
-        proiect: document.getElementById('proiect').value,
-        perioada: perioadaCombinata,
-        pozitii: document.getElementById('pozitii').value,
-        bani: document.getElementById('bani').value,
-        locatie: document.getElementById('locatie').value,
-        output: document.getElementById('output').value
-    };
+        const idEditare = document.getElementById('proiectId').value;
+        const perioadaCombinata = `${document.getElementById('dataStart').value} / ${document.getElementById('dataEnd').value}`;
 
-    // Dacă avem un ID în câmpul ascuns, folosim PUT (actualizare), dacă nu, folosim POST (creare)
-    const metoda = idEditare ? 'PUT' : 'POST';
-    const urlServer = idEditare ? `/api/proiecte/${idEditare}` : '/api/proiecte';
+        const dateFormular = {
+            enabler: document.getElementById('enabler').value,
+            proiect: document.getElementById('proiect').value,
+            perioada: perioadaCombinata,
+            pozitii: document.getElementById('pozitii').value,
+            bani: document.getElementById('bani').value,
+            locatie: document.getElementById('locatie').value,
+            output: document.getElementById('output').value
+        };
 
-    try {
-        const raspuns = await fetch(urlServer, {
-            method: metoda,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dateFormular)
-        });
+        const metoda = idEditare ? 'PUT' : 'POST';
+        const urlServer = idEditare ? `/api/proiecte/${idEditare}` : '/api/proiecte';
 
-        if (raspuns.ok) {
-            // Curățăm formularul
-            document.getElementById('formularProiect').reset();
-            document.getElementById('proiectId').value = ''; // Golim ID-ul ascuns
-            document.querySelector('button[type="submit"]').innerText = 'Salvează în Baza de Date'; // Resetăm butonul
-            
-            incarcaProiecte(); // Reîncărcăm tabelul
-        } else {
-            alert('A apărut o eroare la salvarea în baza de date.');
+        try {
+            const raspuns = await fetch(urlServer, {
+                method: metoda,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dateFormular)
+            });
+
+            if (raspuns.ok) {
+                formularProiect.reset();
+                document.getElementById('proiectId').value = ''; 
+                document.querySelector('button[type="submit"]').innerText = 'Salvează în Baza de Date';
+                
+                // Verificăm dacă funcția există înainte de a o apela
+                if (typeof incarcaProiecte === 'function') {
+                    incarcaProiecte();
+                }
+            } else {
+                alert('A apărut o eroare la salvarea în baza de date.');
+            }
+        } catch (eroare) {
+            console.error('Eroare la trimiterea datelor:', eroare);
         }
-    } catch (eroare) {
-        console.error('Eroare la trimiterea datelor:', eroare);
-    }
-});
+    });
+} else {
+    console.log("Formularul 'formularProiect' nu este pe această pagină. Ignorăm logica de submit.");
+}
 
 // Încărcăm proiectele la deschiderea paginii
 incarcaProiecte();

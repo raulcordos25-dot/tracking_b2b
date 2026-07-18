@@ -26,6 +26,7 @@
     Logat ca: <strong id="emailUtilizator">Se încarcă...</strong>
 </div>
 </head>
+<script src="app.js"></script>
 <body class="bg-light">
 <div class="container mt-5">
     <h2 class="text-center mb-4 text-primary">Management Proiecte Enablers</h2>
@@ -131,7 +132,7 @@
 </div>
 
 <!-- Conectăm logica noastră JavaScript la acest HTML -->
-<script src="app.js"> const token = localStorage.getItem('tokenAuth');
+<script> const token = localStorage.getItem('tokenAuth');
 
     if (token) {
         // 2. Desfacem token-ul (JWT-ul este un string împărțit în 3 părți cu puncte)
@@ -140,7 +141,6 @@
         const baza64 = baza64Url.replace(/-/g, '+').replace(/_/g, '/');
         const dateUtilizator = JSON.parse(window.atob(baza64));
 
-        // 3. Afișăm email-ul în elementul creat
         document.getElementById('emailUtilizator').innerText = dateUtilizator.email;
     }</script>
 </body>
