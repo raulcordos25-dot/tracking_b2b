@@ -7,7 +7,6 @@
     <script>
         // 1. Căutăm "biletul" în memoria browserului
         const vipToken = localStorage.getItem('tokenAuth');
-
         // 2. Verificăm dacă biletul există
         if (!tokenAuth) {
             // Dacă nu are bilet, blocăm accesul și îl trimitem la pagina de login
@@ -16,6 +15,12 @@
         } else {
             // Dacă are bilet, îl lăsăm să treacă
             console.log('Acces permis! Token detectat.');
+        }
+        const esteLogat = localStorage.getItem('tokenAuth');
+
+        // Dacă nu există token, trimitem utilizatorul forțat la pagina de login
+        if (!esteLogat) {
+            window.location.href = 'login.html';
         }
     </script>
     <!-- Includem Bootstrap pentru un design modern fără a scrie mult CSS -->
