@@ -3,7 +3,10 @@
 // 1. Importăm bibliotecile instalate anterior
 const express = require('express');
 const mysql = require('mysql2/promise');
-require('dotenv').config(); // Această linie citește datele din fișierul .env
+require('dotenv').config(); 
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'un_secret_foarte_complicat_123';// Această linie citește datele din fișierul .env
 
 const app = express();
 
@@ -45,11 +48,91 @@ async function initializeazaBazaDeDate() {
     } catch (error) {
         console.error("Eroare la crearea tabelului MySQL:", error.message);
     }
-}
+    // 1. Creăm tabelul de utilizatori
+// 1. Creăm tabelul de utilizatori
+await pool.execute(`
+    CREATE TABLE IF NOT EXISTS utilizatori (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        parola VARCHAR(255) NOT NULL
+    )
+`);
+
+// 2. Verificăm dacă există deja utilizatori. Dacă nu, creăm unul implicit.
+const [utilizatori] = await pool.execute('SELECT * FROM utilizatori');
+if (utilizatori.length === 0) {
+    // Criptăm parola înainte să o salvăm
+    const parolaCriptata = await bcrypt.hash('Parola123!', 10);
+    await pool.execute(
+        'INSERT INTO utilizatori (email, parola) VALUES (?, ?)', 
+        ['admin@tracker.ro', parolaCriptata]
+    );
+    console.log("Cont creat automat: admin@tracker.ro | Parola: Parola123!");
+        }
+    }
 // Apelăm funcția la pornire
 initializeazaBazaDeDate();
 
 // 5. RUTA PENTRU SALVARE (POST): Primi date de la site și le salvăm în MySQL
+// RUTA PENTRU AUTENTIFICARE
+// RUTA PENTRU AUTENTIFICARE
+app.post('/api/login', async (req, res) => {
+    const { email, parola } = req.body;
+
+    try {
+        // Aici am corectat variabila: folosim "pool" în loc de "poolLocal"
+        const [utilizatori] = await pool.execute('SELECT * FROM utilizatori WHERE email = ?', [email]);
+        const utilizator = utilizatori[0];
+
+        // Dacă emailul nu există în baza de date
+        if (!utilizator) {
+            return res.status(401).json({ mesaj: 'Email sau parolă incorectă' });
+        }
+
+        // Comparăm parola din formular cu parola criptată din baza de date
+        const parolaE_Corecta = await bcrypt.compare(parola, utilizator.parola);
+        if (!parolaE_Corecta) {
+            return res.status(401).json({ mesaj: 'Email sau parolă incorectă' });
+        }
+
+        // Totul este corect! Generăm biletul VIP (Token JWT) valabil 24 ore
+        const token = jwt.sign({ id: utilizator.id, email: utilizator.email }, JWT_SECRET, { expiresIn: '24h' });
+        
+        // Trimitem biletul către browser
+        res.json({ mesaj: 'Autentificare reușită!', token: token });
+
+    } catch (eroare) {
+        console.error(eroare);
+        res.status(500).json({ mesaj: 'Eroare de server' });
+    }
+});
+// RUTA PENTRU ADĂUGARE UTILIZATOR NOU
+app.post('/api/inregistrare', async (req, res) => {
+    const { email, parola } = req.body;
+
+    try {
+        // 1. Ne asigurăm că emailul nu este deja folosit
+        const [utilizatoriExistenti] = await pool.execute('SELECT * FROM utilizatori WHERE email = ?', [email]);
+        if (utilizatoriExistenti.length > 0) {
+            return res.status(400).json({ mesaj: 'Acest email există deja în sistem.' });
+        }
+
+        // 2. Criptăm (ascundem) noua parolă
+        const parolaCriptata = await bcrypt.hash(parola, 10);
+
+        // 3. Salvăm noul utilizator în baza de date
+        await pool.execute(
+            'INSERT INTO utilizatori (email, parola) VALUES (?, ?)', 
+            [email, parolaCriptata]
+        );
+
+        res.status(201).json({ mesaj: 'Utilizatorul a fost creat cu succes!' });
+
+    } catch (eroare) {
+        console.error("Eroare la crearea contului:", eroare);
+        res.status(500).json({ mesaj: 'Eroare de server la salvarea utilizatorului.' });
+    }
+});
 app.post('/api/proiecte', async (req, res) => {
     // Extragem fiecare câmp din datele primite
     const { enabler, proiect, perioada, pozitii, output, bani, locatie } = req.body;

@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tracker Proiecte Enablers</title>
+    <script>
+        // 1. Căutăm "biletul" în memoria browserului
+        const vipToken = localStorage.getItem('tokenAuth');
+
+        // 2. Verificăm dacă biletul există
+        if (!tokenAuth) {
+            // Dacă nu are bilet, blocăm accesul și îl trimitem la pagina de login
+            alert('Acces interzis! Trebuie să te autentifici pentru a vedea tabelul.');
+            window.location.href = 'login.html'; // Schimbă aici cu pagina ta de intrare
+        } else {
+            // Dacă are bilet, îl lăsăm să treacă
+            console.log('Acces permis! Token detectat.');
+        }
+    </script>
     <!-- Includem Bootstrap pentru un design modern fără a scrie mult CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
