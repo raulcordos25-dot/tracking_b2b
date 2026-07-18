@@ -2,7 +2,7 @@
 
 /* 1. Stilizarea generală a paginii (Fundal și Font) */
 body {
-    background-color: #f4f7f6; /* Un gri-albăstrui foarte deschis, relaxant */
+    background-color: black; /* Un gri-albăstrui foarte deschis, relaxant */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333333;
 }
@@ -83,6 +83,6 @@ h2.text-primary {
 
 /* Efect când treci cu mouse-ul peste un rând din tabel */
 .table tbody tr:hover {
-    background-color: #f8fafc;
+    background-color: yellow;
     cursor: default;
 }
