@@ -1,25 +1,33 @@
-// public/app.js - COD COMPLET ACTUALIZAT
+// public/app.js - COD ACTUALIZAT CU MĂSURI DE SIGURANȚĂ
 
-let proiecteSalvate = []; // Variabilă globală pentru a ține minte datele afișate
+let proiecteSalvate = []; 
 
 async function incarcaProiecte() {
     try {
-        // Luăm biletul de acces
         const token = localStorage.getItem('tokenAuth');
 
-        // Cerem datele de la server
+        // MĂSURĂ DE SIGURANȚĂ: Dacă nu există token, oprim funcția din start
+        if (!token) {
+            console.error("Nu s-a găsit niciun token. Utilizatorul nu este logat.");
+            return;
+        }
+
         const raspuns = await fetch('/api/proiecte', {
-           method: 'GET', // (sau POST, în funcție de ce face funcția ta)
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                // AICI ESTE REZOLVAREA: 
-                // Cuvântul 'Bearer ' urmat de spațiu este standardul în programare pentru token-uri
                 'Authorization': `Bearer ${token}` 
             }
         });
 
+        // Verificăm specific dacă primim eroarea 403 pentru a oferi un mesaj clar
+        if (raspuns.status === 403) {
+            console.error("Eroare 403: Serverul a respins token-ul. (Verifică JWT_SECRET în Vercel sau codul backend)");
+            return;
+        }
+
         if (!raspuns.ok) {
-            console.error("Eroare de autentificare sau de la server.");
+            console.error("Eroare de la server:", raspuns.status);
             return;
         }
 
@@ -31,7 +39,6 @@ async function incarcaProiecte() {
         proiecteSalvate.forEach(p => {
             const rand = document.createElement('tr');
             
-            // Rândul tabelului cu noile butoane modernizate
             rand.innerHTML = `
                 <td>${p.enabler}</td>
                 <td>${p.proiect}</td>
@@ -42,30 +49,27 @@ async function incarcaProiecte() {
                 <td>${p.output}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-primary me-2 shadow-sm" style="cursor: pointer;" onclick="editeazaProiect('${p.id}')">Editează</button>
-                    <button type="button" class="btn btn-sm btn-primary me-2 shadow-sm" style="cursor: pointer;" onclick="stergeProiect('${p.id}')">Șterge</button>
+                    <button type="button" class="btn btn-sm btn-danger me-2 shadow-sm" style="cursor: pointer;" onclick="stergeProiect('${p.id}')">Șterge</button>
                 </td>
             `;
             corpTabel.appendChild(rand);
         });
     } catch (eroare) {
-        console.error('Eroare la încărcarea datelor:', eroare);
+        console.error('Eroare tehnică la încărcarea datelor:', eroare);
     }
 }
 
 // Funcția care se activează la apăsarea butonului "Editează"
-// Funcția care se activează la apăsarea butonului "Editează"
 function editeazaProiect(id) {
     console.log("S-a apăsat butonul Editează pentru ID-ul:", id);
     
-    // Folosim "==" (egalitate simplă) pentru a ignora diferențele dintre text și număr
     const proiect = proiecteSalvate.find(p => p.id == id);
     
     if (!proiect) {
-        console.error("Eroare: Nu am găsit proiectul. Iată datele pe care le avem:", proiecteSalvate);
-        return; // Oprim execuția dacă nu găsim proiectul
+        console.error("Eroare: Nu am găsit proiectul.");
+        return; 
     }
     
-    // Completăm formularul cu datele proiectului
     document.getElementById('proiectId').value = proiect.id; 
     document.getElementById('enabler').value = proiect.enabler || '';
     document.getElementById('proiect').value = proiect.proiect || '';
@@ -89,30 +93,34 @@ function editeazaProiect(id) {
 
 // Funcția pentru ștergere
 async function stergeProiect(id) {
-    console.log("S-a apăsat butonul Șterge pentru ID-ul:", id);
-    
     if (!confirm('Ești sigur că vrei să ștergi acest proiect?')) return;
     
     try {
         const token = localStorage.getItem('tokenAuth');
+        if (!token) return alert('Trebuie să fii logat pentru a șterge!');
+
         const raspuns = await fetch(`/api/proiecte/${id}`, { 
             method: 'DELETE',
             headers: { 
-                'Authorization': 'Bearer ' + token 
+                'Authorization': `Bearer ${token}`
             }
         });
         
+        if (raspuns.status === 403) {
+            return alert("Sesiune invalidă! Serverul a respins token-ul.");
+        }
+
         if (raspuns.ok) {
             console.log("Proiect șters cu succes!");
-            incarcaProiecte(); // Reîncărcăm tabelul
+            incarcaProiecte(); 
         } else {
-            console.error("Eroare la ștergerea de pe server.");
             alert("Nu s-a putut șterge proiectul. Verifică consola.");
         }
     } catch (eroare) {
         console.error('Eroare tehnică la ștergere:', eroare);
     }
 }
+
 // Interceptarea formularului (Creare / Actualizare)
 const formularProiect = document.getElementById('formularProiect');
 
@@ -136,28 +144,32 @@ if (formularProiect) {
         const metoda = idEditare ? 'PUT' : 'POST';
         const urlServer = idEditare ? `/api/proiecte/${idEditare}` : '/api/proiecte';
         
-        // Preluăm token-ul pentru salvare
         const token = localStorage.getItem('tokenAuth');
+        if (!token) {
+            alert('Sesiune expirată. Te rog să te loghezi din nou!');
+            return;
+        }
 
         try {
-            // Aici lipsea cuvântul 'fetch'
             const raspuns = await fetch(urlServer, {
                 method: metoda,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token 
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(dateFormular)
             });
+
+            if (raspuns.status === 403) {
+                alert("Eroare de autorizare! Serverul a respins acțiunea.");
+                return;
+            }
 
             if (raspuns.ok) {
                 formularProiect.reset();
                 document.getElementById('proiectId').value = ''; 
                 document.querySelector('button[type="submit"]').innerText = 'Salvează în Baza de Date';
-                
-                if (typeof incarcaProiecte === 'function') {
-                    incarcaProiecte();
-                }
+                incarcaProiecte();
             } else {
                 alert('A apărut o eroare la salvarea în baza de date.');
             }
@@ -165,8 +177,6 @@ if (formularProiect) {
             console.error('Eroare la trimiterea datelor:', eroare);
         }
     });
-} else {
-    console.log("Formularul 'formularProiect' nu este pe această pagină. Ignorăm logica de submit.");
 }
 
 // Încărcăm proiectele la deschiderea paginii
