@@ -9,8 +9,12 @@ async function incarcaProiecte() {
 
         // Cerem datele de la server
         const raspuns = await fetch('/api/proiecte', {
-            headers: { 
-                'Authorization': 'Bearer ' + token 
+           method: 'GET', // (sau POST, în funcție de ce face funcția ta)
+            headers: {
+                'Content-Type': 'application/json',
+                // AICI ESTE REZOLVAREA: 
+                // Cuvântul 'Bearer ' urmat de spațiu este standardul în programare pentru token-uri
+                'Authorization': `Bearer ${token}` 
             }
         });
 
