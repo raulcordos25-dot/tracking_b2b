@@ -40,7 +40,7 @@ async function incarcaProiecte() {
             const rand = document.createElement('tr');
             
             rand.innerHTML = `
-            <td>${p.responsabil}</td>
+            <td>${p.responsabil || '-'}</td>
                 <td>${p.enabler}</td>
                 <td>${p.proiect}</td>
                 <td>${p.perioada}</td>
