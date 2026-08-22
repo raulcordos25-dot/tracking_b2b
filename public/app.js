@@ -40,6 +40,7 @@ async function incarcaProiecte() {
             const rand = document.createElement('tr');
             
             rand.innerHTML = `
+            <td>${p.responsabil}</td>
                 <td>${p.enabler}</td>
                 <td>${p.proiect}</td>
                 <td>${p.perioada}</td>
@@ -61,6 +62,7 @@ async function incarcaProiecte() {
 
 // Funcția care se activează la apăsarea butonului "Editează"
 function editeazaProiect(id) {
+    document.getElementById('responsabil').value = proiect.responsabil || '';
     console.log("S-a apăsat butonul Editează pentru ID-ul:", id);
     
     const proiect = proiecteSalvate.find(p => p.id == id);
@@ -69,7 +71,8 @@ function editeazaProiect(id) {
         console.error("Eroare: Nu am găsit proiectul.");
         return; 
     }
-    
+    const responsabil = document.getElementById('responsabil').value;
+// Adaugă 'responsabil' în obiectul pe care îl trimiți către backend
     document.getElementById('proiectId').value = proiect.id; 
     document.getElementById('enabler').value = proiect.enabler || '';
     document.getElementById('proiect').value = proiect.proiect || '';

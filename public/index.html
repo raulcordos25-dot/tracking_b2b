@@ -73,20 +73,16 @@
             <!-- public/index.html (Doar secțiunea formularului) -->
              
 <form id="formularProiect">
-
     <input type="hidden" id="proiectId" value="">
-    <div class="row g-3">
-        <div class="col-md-4">
-            <label class="form-label">Nume Enabler</label>
-            <input type="text" class="form-control" id="enabler" required>
-        </div>
-        
-        <!-- MODIFICAREA 1: Lista Drop-down pentru Proiect -->
-        <div class="col-md-4">
-            <label class="form-label">Proiect Dorit</label>
-            <!-- Folosim <select> în loc de <input> pentru a crea lista -->
-            <select class="form-select" id="proiect" required>
-                <option value="heartbeat">heartbeat</option>
+    <div class="row g-4">
+    <!-- Rândul 1 -->
+    <div class="col-md-4">
+        <label class="form-label text-muted fw-bold small">Nume Enabler</label>
+        <input type="text" class="form-control shadow-sm" id="enabler" required>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label text-muted fw-bold small">Proiect Dorit</label>
+        <select class="form-select shadow-sm" id="proiect" required>
 <option value="fingerprint">fingerprint</option>
 <option value="global classroom">global classroom</option>
 <option value="discover">discover</option>
@@ -104,41 +100,45 @@
 <option value="rooted">rooted</option>
 <option value="myself, my world">myself, my world</option>
 <option value="scale up!">scale up!</option>
-            </select>
-        </div>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label text-muted fw-bold small">Responsabil Proiect</label>
+        <input type="text" class="form-control shadow-sm" id="responsabil" required>
+    </div>
 
-        <!-- MODIFICAREA 2: Selectarea a 2 date (Calendar) -->
-        <div class="col-md-4">
-            <label class="form-label">Perioada (Start - Sfârșit)</label>
-            <!-- Folosim un 'input-group' din Bootstrap pentru a le lipi vizual -->
-            <div class="input-group">
-                <!-- type="date" deschide automat un calendar când dai click -->
-                <input type="date" class="form-control" id="dataStart" required>
-                <span class="input-group-text">până la</span>
-                <input type="date" class="form-control" id="dataEnd" required>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <label class="form-label">Poziții Deschise</label>
-            <input type="number" class="form-control" id="pozitii" required>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">Buget / Bani</label>
-            <input type="text" class="form-control" id="bani">
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Locație</label>
-            <input type="text" class="form-control" id="locatie">
-        </div>
-        <div class="col-12">
-            <label class="form-label">Output / Notițe Meeting</label>
-            <textarea class="form-control" id="output" rows="2"></textarea>
-        </div>
-        <div class="col-12 text-end mt-3">
-            <button type="submit" class="btn btn-primary">Salvează în Baza de Date</button>
+    <!-- Rândul 2 -->
+    <div class="col-md-6">
+        <label class="form-label text-muted fw-bold small">Perioada (Start - Sfârșit)</label>
+        <div class="input-group shadow-sm">
+            <input type="date" class="form-control" id="dataStart" required>
+            <span class="input-group-text bg-light border-start-0 border-end-0">până la</span>
+            <input type="date" class="form-control" id="dataEnd" required>
         </div>
     </div>
+    <div class="col-md-3">
+        <label class="form-label text-muted fw-bold small">Poziții Deschise</label>
+        <input type="number" class="form-control shadow-sm" id="pozitii" required>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label text-muted fw-bold small">Buget / Bani</label>
+        <input type="text" class="form-control shadow-sm" id="bani">
+    </div>
+
+    <!-- Rândul 3 -->
+    <div class="col-md-12">
+        <label class="form-label text-muted fw-bold small">Locație</label>
+        <input type="text" class="form-control shadow-sm" id="locatie">
+    </div>
+    <div class="col-12">
+        <label class="form-label text-muted fw-bold small">Output / Notițe Meeting</label>
+        <textarea class="form-control shadow-sm" id="output" rows="2"></textarea>
+    </div>
+    
+    <div class="col-12 text-end mt-4">
+        <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm">Salvează în Baza de Date</button>
+    </div>
+</div>
 </form>
         </div>
     </div>
@@ -149,6 +149,7 @@
         <table class="table table-hover mb-0">
             <thead class="table-dark">
                 <tr>
+                    <th>Responsabil</th>
                     <th>Enabler</th>
                     <th>Proiect</th>
                     <th>Perioada</th>
