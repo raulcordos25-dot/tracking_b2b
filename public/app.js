@@ -72,11 +72,9 @@ function editeazaProiect(id) {
         return; 
     }
     const responsabil = document.getElementById('responsabil').value;
-// Adaugă 'responsabil' în obiectul pe care îl trimiți către backend
     document.getElementById('proiectId').value = proiect.id; 
     document.getElementById('enabler').value = proiect.enabler || '';
     document.getElementById('proiect').value = proiect.proiect || '';
-    
     if (proiect.perioada) {
         const dateCalendar = proiect.perioada.split(' / ');
         if(dateCalendar.length === 2) {
@@ -141,6 +139,7 @@ if (formularProiect) {
             pozitii: document.getElementById('pozitii').value,
             bani: document.getElementById('bani').value,
             locatie: document.getElementById('locatie').value,
+            responsabil: document.getElementById('responsabil').value,
             output: document.getElementById('output').value
         };
 
