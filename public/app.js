@@ -62,7 +62,6 @@ async function incarcaProiecte() {
 
 // Funcția care se activează la apăsarea butonului "Editează"
 function editeazaProiect(id) {
-    document.getElementById('responsabil').value = proiect.responsabil || '';
     console.log("S-a apăsat butonul Editează pentru ID-ul:", id);
     
     const proiect = proiecteSalvate.find(p => p.id == id);
@@ -87,7 +86,7 @@ function editeazaProiect(id) {
     document.getElementById('bani').value = proiect.bani || '';
     document.getElementById('locatie').value = proiect.locatie || '';
     document.getElementById('output').value = proiect.output || '';
-    
+    document.getElementById('responsabil').value = proiect.responsabil || '';
     document.querySelector('button[type="submit"]').innerText = 'Actualizează Proiectul';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
