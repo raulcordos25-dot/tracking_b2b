@@ -50,7 +50,7 @@ async function incarcaProiecte() {
                 <td>${p.output}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-primary me-2 shadow-sm" style="cursor: pointer;" onclick="editeazaProiect('${p.id}')">Editează</button>
-                    <button type="button" class="btn btn-sm btn-danger me-2 shadow-sm" style="cursor: pointer;" onclick="stergeProiect('${p.id}')">Șterge</button>
+                    <button type="button" class="btn btn-sm btn-primary me-2 shadow-sm" style="cursor: pointer;" onclick="stergeProiect('${p.id}')">Șterge</button>
                 </td>
             `;
             corpTabel.appendChild(rand);
