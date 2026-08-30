@@ -51,7 +51,7 @@
                 const date = await raspuns.json();
 
                 if (raspuns.ok) {
-                    localStorage.setItem('tokenAuth', date.token);
+                    sessionStorage.setItem('tokenAuth', date.token);
                     window.location.href = '/index.html';
                 } else {
                     mesajEroare.classList.remove('d-none');

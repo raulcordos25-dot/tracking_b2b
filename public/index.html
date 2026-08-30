@@ -37,7 +37,7 @@
 </style>
     <script>
     // Verificăm ce găsește în seif
-    const vipToken = localStorage.getItem('tokenAuth');
+    const vipToken = sessionStorage.getItem('tokenAuth');
     
     console.log("Valoarea token-ului găsită:", vipToken);
 
@@ -168,7 +168,7 @@
 </div>
 
 <!-- Conectăm logica noastră JavaScript la acest HTML -->
-<script> const token = localStorage.getItem('tokenAuth');
+<script> const token = sessionStorage.getItem('tokenAuth');
 
     if (token) {
         // 2. Desfacem token-ul (JWT-ul este un string împărțit în 3 părți cu puncte)
