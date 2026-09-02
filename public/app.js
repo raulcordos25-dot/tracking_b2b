@@ -4,7 +4,7 @@ let proiecteSalvate = [];
 
 async function incarcaProiecte() {
     try {
-        const token = localStorage.getItem('tokenAuth');
+        const token = sessionStorage.getItem('tokenAuth');
 
         // MĂSURĂ DE SIGURANȚĂ: Dacă nu există token, oprim funcția din start
         if (!token) {
@@ -96,7 +96,7 @@ async function stergeProiect(id) {
     if (!confirm('Ești sigur că vrei să ștergi acest proiect?')) return;
     
     try {
-        const token = localStorage.getItem('tokenAuth');
+        const token = sessionStorage.getItem('tokenAuth');
         if (!token) return alert('Trebuie să fii logat pentru a șterge!');
 
         const raspuns = await fetch(`/api/proiecte/${id}`, { 
@@ -145,7 +145,7 @@ if (formularProiect) {
         const metoda = idEditare ? 'PUT' : 'POST';
         const urlServer = idEditare ? `/api/proiecte/${idEditare}` : '/api/proiecte';
         
-        const token = localStorage.getItem('tokenAuth');
+        const token = sessionStorage.getItem('tokenAuth');
         if (!token) {
             alert('Sesiune expirată. Te rog să te loghezi din nou!');
             return;
