@@ -143,8 +143,22 @@ app.post('/api/inregistrare', async (req, res) => {
 // OBȚINE DOAR PROIECTELE UTILIZATORULUI CURENT
 app.get('/api/proiecte', verificaToken, async (req, res) => {
     try {
-        const [randuri] = await pool.execute('SELECT * FROM proiecte WHERE utilizator_id = ?', [req.utilizator.id]);
-        res.json(randuri);
+        // 1. Verificăm dacă email-ul din token este cel de Admin
+        if (req.utilizator.email === 'admin@tracker.ro') {
+            
+            // ADMIN: Cerem absolut toate datele din tabel, ignorând id-ul utilizatorului
+            console.log("Administratorul a cerut datele. Trimitem tot tabelul.");
+            const [randuri] = await pool.execute('SELECT * FROM proiecte');
+            res.json(randuri);
+            
+        } else {
+            
+            // NORMAL: Cerem doar proiectele care îi aparțin acestui utilizator
+            console.log(`Utilizatorul ${req.utilizator.email} a cerut datele lui.`);
+            const [randuri] = await pool.execute('SELECT * FROM proiecte WHERE utilizator_id = ?', [req.utilizator.id]);
+            res.json(randuri);
+            
+        }
     } catch (eroare) {
         console.error(eroare);
         res.status(500).json({ mesaj: 'Eroare la preluarea proiectelor' });
